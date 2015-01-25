@@ -1,0 +1,38 @@
+#################################################################
+language: python
+
+python:
+  - "2.7"
+
+#Desplegar SaraosOSL en GAE
+env:
+  global:
+    - GAE_DIR=/tmp/gae
+    - GAE_PASSWORD=helterskelter8
+    - EMAIL=miguel92grnd@gmail.com
+    - secure: Tofltpxb9Hdn/DOGfYb2oZCU7j6ERDt2A+L0//Psj8s7Zp+KrsJMr6lhTpxkZ/8j+2DDLtah1YEoH4PQusEShFvFkk1GUVT98LlINkvNz7KGtPGYqmJ1eQp9unfA3ron1cyzs8TbjVG+GQr+IDKuXdUYr1XJsNzIept8fPXhR1RM1It2Q388mYuH+E+OfDnm1LocjzE0Qx7XwX7wq3AkiufdkYuwSOXo7JEC9w5eaKRTbhjFurvujbqT11eBgjQlC1kcGZezpeYuXwpRer+DwPudFEN3C/nZs50VKLhMp3Hpq1914/TVavczvKyRAB0yqzDm9d0ZlRZ3Bm5XQ9p4kg==
+
+before_install:
+  - >
+    test -e $GAE_DIR ||
+    (mkdir -p $GAE_DIR && wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.17.zip -q -O /tmp/gae.zip && unzip /tmp/gae.zip -d $GAE_DIR)
+     
+#Instalar requeriments
+install:
+   - pip install -r requirements.txt
+
+
+before_script:
+   - echo 'Europe/Madrid' | sudo tee /etc/timezone
+   - sudo dpkg-reconfigure --frontend noninteractive tzdata
+   - mkdir -p shippable/testresults
+   - mkdir -p shippable/codecoverage
+
+#Ejecutamos el script
+script:
+  - >
+    nosetests test.py --with-gae --gae-lib-root=$GAE_DIR/google_appengine --with-xunit --xunit-file=shippable/testresults/test.xml --with-coverage --cover-xml --cover-xml-file=shippable/codecoverage/coverage.xml
+
+#Si se construye bien hacer esto
+after_success:
+    - echo $GAE_PASSWORD | $GAE_DIR/google_appengine/appcfg.py -e $EMAIL --passin update .
