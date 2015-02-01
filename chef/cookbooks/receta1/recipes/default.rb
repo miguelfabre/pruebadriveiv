@@ -23,9 +23,9 @@ execute "install python3-setuptools" do
   command "sudo chroot /home/jaulas/saucy32/ apt-get install python3-setuptools -y"
 end
 
-execute "easy_install3 pip" do
-	command "easy_install3 pip"
-end
+#execute "easy_install3 pip" do
+#	command "easy_install3 pip"
+#end
 
 execute "install python-dev build-essential" do
   command "sudo chroot /home/jaulas/saucy32/ apt-get install python-dev build-essential -y"
@@ -71,9 +71,9 @@ execute "unzip google-api" do
 end
 
 # Instalamos la herramienta cURL para hacer uso de ésta a la hora de ejecutar los tests
-execute "install curl" do
- command "sudo chroot /home/jaulas/saucy32/ apt-get install curl -y"
-end
+#execute "install curl" do
+# command "sudo chroot /home/jaulas/saucy32/ apt-get install curl -y"
+#end
 
 # Una vez hecho esto ya tenemos instalado el entorno de desarrollo necesario para construir y ejecutar aplicaciones que luego funcionarán bajo Google App Engine
 #Instalamos git
@@ -88,9 +88,9 @@ end
 
 #Ejecutamos el .py de nuestra app
 
-#execute "execute app"
-#	command "sudo chroot /home/jaulas/saucy32/ python google_appengine/dev_appserver.py --host=0.0.0.0 pruebadriveiv/"
-#end
+execute "execute app"
+	command "sudo chroot /home/jaulas/saucy32/ python google_appengine/dev_appserver.py --host=0.0.0.0 pruebadriveiv/"
+end
 
 
 
