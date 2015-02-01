@@ -5,6 +5,30 @@ api_version: 1
 threadsafe: true
 
 handlers:
+- url: /css
+  static_dir: templates/css
+
+- url: /json
+  static_dir: templates/json
+
+- url: /fonts
+  static_dir: templates/fonts
+
+- url: /js
+  static_dir: templates/js
+
+- url: /less
+  static_dir: templates/less
+
+- url: /img
+  static_dir: static/img
+
 - url: /.*
   script: pruebadriveiv.application
+
+libraries:
+- name: jinja2
+  version: latest
+
+
 

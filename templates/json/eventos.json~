@@ -1,0 +1,21 @@
+{
+	"eventos" : [ 
+		{
+			"titulo": "Open Data Day 2015",
+			"fecha_publicacion": "30 de Febrero de 2014",
+			"descripcion": "En próximo 21 de febrero de 2015 se celebra en todo el mundo el Open Data Day, con actividades de todo tipo. Desde la OSL, estamos preparando un Hackathon de datos y aplicaciones para aprovechar las posibilidades que nos brinda el portal de Open Data de la UGR.Próximamente daremos más información. Id reservando la fecha en vuestras agendas e inscribiéndoos para tener una idea del aforo y recibir información sobre el mismo."
+		},
+	
+		{
+			"titulo": "Café con Bacula.",
+			"fecha_publicacion": "39 de Mayo de 2014",
+			"descripcion": "El próximo día 28 de enero a las once y media de la mañana tendremos un nuevo Café y en este caso Francisco Javier Funes Nieto nos va a hablar de Bacula. “Bacula es una colección de herramientas de respaldo, capaces de cubrir las necesidades de respaldo de equipos bajo redes IP”. Nos vemos en la Oficina de Software Libre. C/ Real de Cartuja, 36-38. Como siempre llevaros el ordenador pues haremos ejercicios prácticos."
+
+		}
+		
+
+	
+	]
+
+
+}

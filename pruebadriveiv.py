@@ -1,9 +1,17 @@
+# -*- coding: utf-8 -*-
 import cgi
 import webapp2
 import time
 import httplib2
+import jinja2
+import os
+import urllib
 #import gflags
 import gdata.spreadsheet.service
+import gspread
+import json
+ 
+from pprint import pprint 
 
 from google.appengine.api import users
 
@@ -18,6 +26,9 @@ from oauth2client.appengine import AppAssertionCredentials
 
 #from google.appengine.ext import webapp
 from oauth2client.appengine import OAuth2Decorator
+
+from google.appengine.api import urlfetch
+urlfetch.set_default_fetch_deadline(45)
 
 
 #FLAGS = gflags.FLAGS
@@ -34,6 +45,7 @@ decorator = OAuth2Decorator(
 
 service = build('calendar', 'v3', developerKey='AIzaSyDwEDO-Qa3ep2l6kP2e_r6ivjKF28D6LXk')
 
+
 class MainHandler(webapp2.RequestHandler):
   @decorator.oauth_required
   def get(self):
@@ -46,61 +58,31 @@ class MainHandler(webapp2.RequestHandler):
 	request = service.events().insert(calendarId='pacops32@gmail.com', body=event).execute(http=http)
 	#response = request.execute(http=http)
 
-#created_event = service.events().insert(calendarId='pacops32@gmail.com', body=event).execute(http=http)
-
-#print created_event['id']
-
-
-
-# If the Credentials don't exist or are invalid, run through the native client
-# flow. The Storage object will ensure that if successful the good
-# Credentials will get written back to a file.
-#storage = Storage('calendar.dat')
-#credentials = storage.get()
-#if credentials is None or credentials.invalid == True:
- # credentials = run(FLOW, storage)
-
-# Create an httplib2.Http object to handle our HTTP requests and authorize it
-# with our good Credentials.
-#http = httplib2.Http()
-#http = credentials.authorize(http)
-
-# Build a service object for interacting with the API. Visit
-# the Google Developers Console
-# to get a developerKey for your own application.
-#service = build(serviceName='calendar', version='v3', http=http,
- #      developerKey='AIzaSyB1dvOxqEYS8KzIZZZT4ez1eMl4b3SGlDU')
-
-
-
-MAIN_PAGE_HTML = """\
-<html>
-  <body>
-    <form action="/sign" method="post">
-	<h3>Nombre del evento</h3>
-      <div><textarea name="nombre" rows="3" cols="60"></textarea></div>
-	<h3>Descripcion del evento</h3>
-      <div><textarea name="descripcion" rows="3" cols="60"></textarea></div>
-      <div><input type="submit" value="Enviar datos"></div>
-
-		<iframe src="https://www.google.com/calendar/embed?src=proyectoivosl%40gmail.com&ctz=Europe/Madrid" style="border: 0" width="400" height="200" frameborder="0" scrolling="no"></iframe>
-    </form>
-  </body>
-</html>
-"""
-
-URL_SPREADSHEET_HTML = """\
-<html>
-  <body>
-    <a href="https://docs.google.com/spreadsheets/d/1R3zLvtKxllRM71PdCDQu9XhNYo7xmf0On49WreyLi24/edit#gid=0">Enlace a la hoja de calculo de Google Drive</a>
-    </form>
-  </body>
-</html>
-"""
-
 class MainPage(webapp2.RequestHandler):
     def get(self):
-        self.response.write(MAIN_PAGE_HTML)	
+		gc = gspread.login(email, password)
+		sht1 = gc.open_by_key(spreadsheet_key)
+		worksheet = sht1.get_worksheet(0)
+		matriz = []
+		num_cols = worksheet.col_count
+		num_fils = worksheet.row_count
+		#Metemos un bucle que recorra toda la hoja y vamos almacenando los datos en una matriz (array de array)
+		i = 1
+		j = 1
+		while i < num_fils:
+			matriz.append([])
+			while j <= num_cols:
+		#Recorremos el documento de forma inversa para mostrar en el blog primero los eventos mas actuales (insertados los ultimos en la hoja de calculo
+				val = worksheet.cell(num_fils-i+1, j).value
+				matriz[i-1].append(val)
+				j = j + 1
+			i = i + 1
+			j = 1
+		
+		# Ahora devolvemos la matriz al html, donde con js la cogeremos y la iremos formateando para mostrar los eventos en el blog
+		template_values = {'matriz': matriz, 'num_fils': num_fils, 'num_cols': num_cols}
+		template = JINJA_ENVIRONMENT.get_template('templates/MAIN_PAGE_HTML_BOOT.html')
+		self.response.write(template.render(template_values))
 
 class Guestbook(webapp2.RequestHandler):
    @decorator.oauth_required
@@ -111,23 +93,42 @@ class Guestbook(webapp2.RequestHandler):
 	client.password = password
 	client.source = 'test client'
 	client.ProgrammaticLogin()
+
+	if self.request.get('inscripcion') == "inscripcion_si":
+		inscripcion = "Si"
+	else:
+		inscripcion = "No"
+
+	if self.request.get('diploma') == "diploma_si":
+		diploma = "Si"
+	else:
+		diploma = "No"
+
+	if self.request.get('tipo') == "tipo_osl":
+		tipo = "OSL"
+	elif self.request.get('tipo') == "tipo_compratido":
+		tipo = "tipo_compratido"
+	else:
+		tipo = "tipo_fuera"
 	    
 	rows = []
-	rows.append({'id':cgi.escape(self.request.get('nombre')),'title':cgi.escape(self.request.get('descripcion'))})
-	#rows.append({'id':'123','title':'12313'})	    
+	tiempo = time.strftime("%c")
+	rows.append({'titulo':cgi.escape(self.request.get('InputName')),'ponente':cgi.escape(self.request.get('InputPonente')),'fecha':tiempo,'inscripcion':inscripcion,'diploma':diploma,'tipo':tipo,'descripcion':cgi.escape(self.request.get('InputDescripcion')),'dia':cgi.escape(self.request.get('dia')),'mes':cgi.escape(self.request.get('mes')),'anio':cgi.escape(self.request.get('anio')),'hora':cgi.escape(self.request.get('hora')),'minuto':cgi.escape(self.request.get('minuto'))})
 	for row in rows:
 		try:
 			client.InsertRow(row, spreadsheet_key, worksheet_id)
 		except Exception as e:
 			print e
-	#return
 	
+	fecha_evento = ""+self.request.get('anio')+"-"+self.request.get('mes')+"-"+self.request.get('dia')
 
 	http = decorator.http()
-	event = {"end": {"date": "2015-01-12"},"start": {"date": "2015-01-12"},"description": cgi.escape(self.request.get('descripcion'))}
+	event = {"end": {"date": fecha_evento},"start": {"date": fecha_evento},"summary": cgi.escape(self.request.get('InputName')),"description": cgi.escape(self.request.get('InputDescripcion'))}
 	request = service.events().insert(calendarId='proyectoivosl@gmail.com', body=event).execute(http=http)
-
-	self.response.write(URL_SPREADSHEET_HTML)
+	
+	template_values = {}
+	template = JINJA_ENVIRONMENT.get_template('templates/hoja_calculo.html')
+	self.response.write(template.render(template_values))
 
 class test(webapp2.RequestHandler):
    def get(self):
@@ -139,7 +140,7 @@ class test(webapp2.RequestHandler):
 	client.ProgrammaticLogin()
 	rows = []
 	tiempo = time.strftime("%c")
-	rows.append({'id':'Prueba','title':tiempo})
+	rows.append({'id':'Prueba','title':'tiempo'})
 	for row in rows:
 		try:
 			client.InsertRow(row, spreadsheet_key, worksheet_id)
@@ -151,14 +152,66 @@ class test(webapp2.RequestHandler):
 
 	self.response.write(URL_SPREADSHEET_HTML)
 
+class Formulario(webapp2.RequestHandler):
+    def get(self):
+		template_values = {}
+		template = JINJA_ENVIRONMENT.get_template('templates/formulario.html')
+		self.response.write(template.render(template_values))
+
+class Hoja(webapp2.RequestHandler):
+    def get(self):
+		template_values = {}
+		template = JINJA_ENVIRONMENT.get_template('templates/hoja_calculo.html')
+		self.response.write(template.render(template_values))
+
+class Certificado(webapp2.RequestHandler):
+    def post(self):
+		ponente = self.request.get('InputPonente')
+		evento = self.request.get('InputName')
+		dia = self.request.get('dia')
+		mes = self.request.get('mes')
+		anio = self.request.get('anio')
+		hora = self.request.get('hora')
+		minuto = self.request.get('minuto')
+		descripcion = self.request.get('InputDescripcion')
+		#ponente = "Manolo"
+		#evento = "Evento"
+		#dia = "Diass"
+		#mes = "Messs"
+		#anio = "Anioss"
+		#hora = "Horasss"
+		#minuto = "Minutosss"
+		template_values = {'ponente': ponente, 'evento': evento, 'dia': dia, 'mes': mes, 'anio': anio, 'hora': hora, 'minuto': minuto, 'descripcion': descripcion}
+		template = JINJA_ENVIRONMENT.get_template('templates/certificado.html')
+		self.response.write(template.render(template_values))
+
+class Json_inserta(webapp2.RequestHandler):
+    def get(self):
+		gc = gspread.login(email, password)
+		sht1 = gc.open_by_key(spreadsheet_key)
+		worksheet = sht1.get_worksheet(0)
+		val = worksheet.cell(4, 1).value
+		val1 = worksheet.row_count
+		self.response.write(val1)
+		
+
 application = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/sign', Guestbook),
+	('/formulario', Formulario),
+	('/hoja', Hoja),
+	('/certificado', Certificado),
     ('/test', test),
-	('/inserta', MainHandler),
+	('/inserta', MainHandler),	
+	('/json', Json_inserta),
 	(decorator.callback_path, decorator.callback_handler())
 
 ], debug=True)
+
+JINJA_ENVIRONMENT = jinja2.Environment(
+	loader = jinja2.FileSystemLoader(os.path.dirname(__file__)),
+	extensions = ['jinja2.ext.autoescape'],
+	autoescape = True)
 
 
 # ---------------------------------------------

@@ -1,0 +1,13 @@
+<html>
+  <body>
+    <form action="/sign" method="post">
+	<h3>Nombre del evento</h3>
+      <div><textarea name="nombre" rows="3" cols="60"></textarea></div>
+	<h3>Descripcion del evento</h3>
+      <div><textarea name="descripcion" rows="3" cols="60"></textarea></div>
+      <div><input type="submit" value="Enviar datos"></div>
+
+		<iframe src="https://www.google.com/calendar/embed?src=proyectoivosl%40gmail.com&ctz=Europe/Madrid" style="border: 0" width="400" height="200" frameborder="0" scrolling="no"></iframe>
+    </form>
+  </body>
+</html>
