@@ -3,6 +3,11 @@ execute "apt-get-update" do
   command "apt-get update"
 end
 
+# Instalación de apache2
+execute "install apach2" do
+  command "apt-get install apache2 -y"
+end
+
 # Instalación de debootstrap
 execute "install debootstrap" do
   command "apt-get install debootstrap"
@@ -89,7 +94,7 @@ end
 #Ejecutamos el .py de nuestra app
 
 execute "execute app"
-	command "sudo chroot /home/jaulas/saucy32/ python google_appengine/dev_appserver.py --host=0.0.0.0 pruebadriveiv/"
+	command "sudo chroot /home/jaulas/saucy32/ python google_appengine/dev_appserver.py pruebadriveiv/ -y"
 end
 
 
