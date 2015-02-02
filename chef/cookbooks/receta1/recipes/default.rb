@@ -4,7 +4,7 @@ execute "apt-get-update" do
 end
 
 # Instalación de apache2
-execute "install apach2" do
+execute "install apache2" do
   command "apt-get install apache2 -y"
 end
 
@@ -93,8 +93,8 @@ end
 
 #Ejecutamos el .py de nuestra app
 
-execute "execute app"
-	command "sudo chroot /home/jaulas/saucy32/ python google_appengine/dev_appserver.py pruebadriveiv/ -y"
+execute "execute app" do
+  command "sudo chroot /home/jaulas/saucy32/ python google_appengine/dev_appserver.py pruebadriveiv/ -y"
 end
 
 
