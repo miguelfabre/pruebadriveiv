@@ -196,12 +196,12 @@ class Json_inserta(webapp2.RequestHandler):
 		
 
 application = webapp2.WSGIApplication([
-    ('/', MainPage),
-    ('/sign', Guestbook),
+    	('/', MainPage),
+    	('/sign', Guestbook),
 	('/formulario', Formulario),
 	('/hoja', Hoja),
 	('/certificado', Certificado),
-    ('/test', test),
+    	('/test', Test),
 	('/inserta', MainHandler),	
 	('/json', Json_inserta),
 	(decorator.callback_path, decorator.callback_handler())
