@@ -8,7 +8,7 @@ python:
 env:
   global:
     - GAE_DIR=/tmp/gae
-    - GAE_PASSWORD=helterskelter8 #you should add pass email
+    - GAE_PASSWORD= #you should add pass email
     - EMAIL=miguel92grnd@gmail.com
     - secure: Tofltpxb9Hdn/DOGfYb2oZCU7j6ERDt2A+L0//Psj8s7Zp+KrsJMr6lhTpxkZ/8j+2DDLtah1YEoH4PQusEShFvFkk1GUVT98LlINkvNz7KGtPGYqmJ1eQp9unfA3ron1cyzs8TbjVG+GQr+IDKuXdUYr1XJsNzIept8fPXhR1RM1It2Q388mYuH+E+OfDnm1LocjzE0Qx7XwX7wq3AkiufdkYuwSOXo7JEC9w5eaKRTbhjFurvujbqT11eBgjQlC1kcGZezpeYuXwpRer+DwPudFEN3C/nZs50VKLhMp3Hpq1914/TVavczvKyRAB0yqzDm9d0ZlRZ3Bm5XQ9p4kg==
 
